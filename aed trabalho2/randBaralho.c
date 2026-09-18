@@ -8,13 +8,15 @@ typedef struct{
     char nome[50];
     int dupla;
     cartas mao[3];
+    int vitorias;
+    int pontos;
 }jogador;
 
 /*Estrutura "mesa" para centralizar informações e facilitar exportação de estatitiscas de rodadas */
 typedef struct{
-    cartas vira[1];
     jogador jogadores[4];
     int rodada;
+    int competidas[4];
 }mesa;
 
 /*Função para cadastrar as informações dos jogadores e definição de suas respectivas duplas*/
@@ -31,22 +33,26 @@ void entradaDados(jogador *jogador){
     }
 }
 
-void inicializarJogadores(tp_fila *f) {
-    int totalJogadores = 4;
-    for (int i = 1; i <= totalJogadores; i++) {
-        inserefila(f, i);
-    }
-}
-
 void imprimeDados (mesa *mesa){
     for (int i =0; i<4; i++){
         printf("\n %d - %s (dupla %d) ", i+1 , mesa->jogadores[i].nome, mesa->jogadores[i].dupla);
         printf("tem as cartas:\n");
         for(int c=0; c<3; c++){
             printf("%c%c \n", mesa->jogadores[i].mao[c].naipe, mesa->jogadores[i].mao[c].carta);
+        }
     }
 }
-printf("A vira da rodada eh a carta: %c%c ", mesa->vira[0].naipe, mesa->vira[0].carta);
+
+void imprimeMao(cartas *mao, char jogador){
+    int tamanho=sizeof(mao);
+    for(int i=0; i<tamanho-1; i++){
+        printf("{Naipe: %c,Numero: %c, Ranking: %d}\n", mao[i].naipe, mao[i].carta, mao[i].rank);
+    }
+}
+
+void imprimeManilha(cartas *manilha){
+    printf("Valor da manilha:\n");
+    printf("{Naipe: %c,Numero: %c, Ranking: %d}\n", manilha->naipe, manilha->carta, manilha->rank);
 }
 
 void distribuirCartas(tp_pilha *baralho, mesa *mesa){
@@ -55,22 +61,23 @@ void distribuirCartas(tp_pilha *baralho, mesa *mesa){
             pop(baralho , &mesa->jogadores[i].mao[c]);
          }
     }
-    pop(baralho, &mesa->vira[0]);
 }
 
 int main(){
-    mesa mesa;  
-    entradaDados(&mesa.jogadores);
-    tp_fila filaTurnos;
-    int jogadorAtual, rodada = 1, jogoRodando = 1, escolha;
-    int embaralho=1;
-    inicializafila(&filaTurnos);
-    inicializarJogadores(&filaTurnos);
     printf("=== INICIO DO JOGO ===\n");
-    
+    mesa mesa;
+    cartas manilha;
+    entradaDados(&mesa.jogadores);
+    int contador=0, rodada = 1, jogoRodando = 1;
+    int embaralho=1;
+    for(int i=0; i<4; i++){
+        mesa.jogadores[i].vitorias=0;
+    }
+    printf("Embaralhando...");
     while (jogoRodando==1) { 
         /*Embaralhamento comeca aqui*/
         if(embaralho==1){
+            contador=0; 
             cartas carta[40] = {{'P','3',40},{'C','3',39},{'E','3',38},{'O','3',37},
                                 {'P','2',36},{'C','2',35},{'E','2',34},{'O','2',33},
                                 {'P','A',32},{'C','A',31},{'E','A',30},{'O','A',29},
@@ -116,23 +123,145 @@ int main(){
 
             /*Manilha comeca aqui*/
             char numero_manilha;
-            cartas manilha;
-            top(&baralho, &manilha);
+            pop(&baralho, &manilha);
             numero_manilha=manilha.carta;
             for(int i=0;i<40;i++){
                 if(&baralho.item[i]==numero_manilha){
                     baralho.item[i].rank+=41;
                 }
             }
+            cartas dump;
             /*Manilha termina aqui*/
             distribuirCartas(&baralho, &mesa);
+            imprimeDados(&mesa);
             embaralho=0;
         }
-        printf("\n--- RODADA %d ---", rodada);
-        printf("\nVez do Jogador %d\n", jogadorAtual);
 
+        int soma1, soma2, status;
+        soma1=mesa.jogadores[0].pontos+mesa.jogadores[1].pontos;
+        soma2=mesa.jogadores[2].pontos+mesa.jogadores[3].pontos;
+        if(soma1==12){
+            printf("Primeira dupla vence o jogo!\n");
+            printf("Jogar novamente? (1=sim, 0=nao)\n");
+            scanf("%d", &status);
+            if(status==0){jogoRodando=0;}
+            else{embaralho=1;}
+        }
+        if(soma2==12){
+            printf("Segunda dupla vence o jogo!\n");
+            printf("Jogar novamente? (1=sim, 0=nao)\n");
+            scanf("%d", &status);
+            if(status==0){jogoRodando=0;}
+            else{embaralho=1;}
+        }
+
+        /*Vez dos jogadores jogarem suas cartas ou declarar truco*/
+        rodada=0;
+        printf("\n--- RODADA %d ---\n", rodada);
+        imprimeManilha(&manilha);
+        printf("\nVez de %s\n", mesa.jogadores[rodada].nome);
+        while(rodada==0){
+            int carta_escolhida;
+            imprimeMao(&mesa.jogadores[rodada].mao, &mesa.jogadores[rodada].nome);
+            printf("Escolha uma carta de 1 a 3 (cima para baixo) para jogar\n");
+            scanf("%d", &carta_escolhida);
+            if(carta_escolhida==1){
+                mesa.competidas[0]=mesa.jogadores[rodada].mao[0].rank;
+                mesa.jogadores[rodada].mao[0].carta="0"; mesa.jogadores[rodada].mao[0].naipe="0"; mesa.jogadores[rodada].mao[0].rank=0;
+                rodada=1;
+            }
+            if(carta_escolhida==2){
+                mesa.competidas[0]=mesa.jogadores[rodada].mao[1].rank;
+                mesa.jogadores[rodada].mao[1].carta="0"; mesa.jogadores[rodada].mao[1].naipe="0"; mesa.jogadores[rodada].mao[1].rank=0;
+                rodada=1;
+            }
+            if(carta_escolhida==3){
+                mesa.competidas[0]=mesa.jogadores[rodada].mao[2].rank;
+                mesa.jogadores[rodada].mao[2].carta="0"; mesa.jogadores[rodada].mao[2].naipe="0"; mesa.jogadores[rodada].mao[2].rank=0;
+                rodada=1;
+            }
+        }
+        printf("\nVez de %s\n", mesa.jogadores[rodada].nome);
+        while(rodada==1){
+            int carta_escolhida;
+            imprimeManilha(&manilha);
+            imprimeMao(&mesa.jogadores[rodada].mao, &mesa.jogadores[rodada].nome);
+            printf("Escolha uma carta de 1 a 3 (cima para baixo) para jogar\n");
+            scanf("%d", &carta_escolhida);
+            if(carta_escolhida==1){
+                mesa.competidas[1]=mesa.jogadores[rodada].mao[0].rank;
+                mesa.jogadores[rodada].mao[0].carta="0"; mesa.jogadores[rodada].mao[0].naipe="0"; mesa.jogadores[rodada].mao[0].rank=0;
+                rodada=2;
+            }
+            if(carta_escolhida==2){
+                mesa.competidas[1]=mesa.jogadores[rodada].mao[1].rank;
+                mesa.jogadores[rodada].mao[1].carta="0"; mesa.jogadores[rodada].mao[1].naipe="0"; mesa.jogadores[rodada].mao[1].rank=0;
+                rodada=2;
+            }
+            if(carta_escolhida==3){
+                mesa.competidas[1]=mesa.jogadores[rodada].mao[2].rank;
+                mesa.jogadores[rodada].mao[2].carta="0"; mesa.jogadores[rodada].mao[2].naipe="0"; mesa.jogadores[rodada].mao[2].rank=0;
+                rodada=2;
+            }
+        }
+        printf("\nVez de %s\n", mesa.jogadores[rodada].nome);
+        while(rodada==2){
+            int carta_escolhida;
+            imprimeManilha(&manilha);
+            imprimeMao(&mesa.jogadores[rodada].mao, &mesa.jogadores[rodada].nome);
+            printf("Escolha uma carta de 1 a 3 (cima para baixo) para jogar\n");
+            scanf("%d", &carta_escolhida);
+            if(carta_escolhida==1){
+                mesa.competidas[2]=mesa.jogadores[rodada].mao[0].rank;
+                mesa.jogadores[rodada].mao[0].carta="0"; mesa.jogadores[rodada].mao[0].naipe="0"; mesa.jogadores[rodada].mao[0].rank=0;
+                rodada=3;
+            }
+            if(carta_escolhida==2){
+                mesa.competidas[2]=mesa.jogadores[rodada].mao[1].rank;
+                mesa.jogadores[rodada].mao[1].carta="0"; mesa.jogadores[rodada].mao[1].naipe="0"; mesa.jogadores[rodada].mao[1].rank=0;
+                rodada=3;
+            }
+            if(carta_escolhida==3){
+                mesa.competidas[2]=mesa.jogadores[rodada].mao[2].rank;
+                mesa.jogadores[rodada].mao[2].carta="0"; mesa.jogadores[rodada].mao[2].naipe="0"; mesa.jogadores[rodada].mao[2].rank=0;
+                rodada=3;
+            }
+        }
+        printf("\nVez de %s\n", mesa.jogadores[rodada].nome);
+        while(rodada==3){
+            int carta_escolhida;
+            imprimeManilha(&manilha);
+            imprimeMao(&mesa.jogadores[rodada].mao, &mesa.jogadores[rodada].nome);
+            printf("Escolha uma carta de 1 a 3 (cima para baixo) para jogar\n");
+            scanf("%d", &carta_escolhida);
+            if(carta_escolhida==1){
+                mesa.competidas[3]=mesa.jogadores[rodada].mao[0].rank;
+                mesa.jogadores[rodada].mao[0].carta="0"; mesa.jogadores[rodada].mao[0].naipe="0"; mesa.jogadores[rodada].mao[0].rank=0;
+                rodada=4;
+            }
+            if(carta_escolhida==2){
+                mesa.competidas[3]=mesa.jogadores[rodada].mao[1].rank;
+                mesa.jogadores[rodada].mao[1].carta="0"; mesa.jogadores[rodada].mao[1].naipe="0"; mesa.jogadores[rodada].mao[1].rank=0;
+                rodada=4;
+            }
+            if(carta_escolhida==3){
+                mesa.competidas[3]=mesa.jogadores[rodada].mao[2].rank;
+                mesa.jogadores[rodada].mao[2].carta="0"; mesa.jogadores[rodada].mao[2].naipe="0"; mesa.jogadores[rodada].mao[2].rank=0;
+                rodada=4;
+            }
+        }
+
+        /*Pesamento das cartas jogadas*/
+        int carta_maior=0;
+        for(int i=0; i<4; i++){
+            if(mesa.competidas[i]>mesa.competidas[carta_maior]){carta_maior=i;}
+        }
+        printf("Jogador %c venceu a rodada!", mesa.jogadores[carta_maior].nome);
+        mesa.jogadores[carta_maior].pontos++;
+        contador++;
+        if(contador==3){
+            embaralho=1;
+        }
     }
-
-
-return 0;
+    return 0;
 }
