@@ -13,7 +13,7 @@ int main(){
     inicializafila(&jogadores1); inicializafila(&jogadores2);
     printf("=== INICIO DO JOGO ===\n");
     mesa mesa;
-    cartas manilha;
+    cartas manilha, virada;
     entradaDados(&mesa.jogadores);
     int contador=1, rodada = 1, jogoRodando = 1;
     int embaralho=1;
@@ -40,7 +40,7 @@ int main(){
             tp_pilha baralho;
             iniPilha(&baralho);
             embaralhador(&baralho); //AVISO: professor, se seu terminal for baixo lembre de dar um scroll pra cima para ver o baralho pre e pos uso do embaralhador
-            manilhadora(&baralho, &manilha);
+            manilhadora(&baralho, &manilha, &virada);
             distribuirCartas(&baralho, &jogadores1);
             sync(&jogadores1, &mesa);
             embaralho=0;
@@ -53,14 +53,18 @@ int main(){
         rodada=0;
         printf("\n--- RODADA %d ---\n", contador);
         while(filavazia(&jogadores1)!=1){
-            int carta_escolhida;
+            int carta_escolhida, check=1;
             jogador temp;
             removefila(&jogadores1, &temp);
             printf("\nVez de %s\n", mesa.jogadores[rodada].nome);
-            imprimeManilha(&manilha);
+            imprimeManilha(&manilha, &virada);
             imprimeMao(&temp.mao);
             printf("Escolha uma carta de 1 a 3 (cima para baixo) para jogar\n");
-            scanf("%d", &carta_escolhida);
+            while(check==1){
+                scanf("%d", &carta_escolhida);
+                if(carta_escolhida<4){check=0;}
+                else{printf("Escolha invalida, insira um numero de 1 a 3 para fazer sua escolha\n");}
+            }
             jogada(&mesa, &temp, carta_escolhida, rodada);
             mesa.jogadores[rodada]=temp;
             inserefila(&jogadores2, temp);

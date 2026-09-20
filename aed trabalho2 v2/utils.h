@@ -37,9 +37,11 @@ void sync(tp_fila *jog, mesa *mes){
 }
 
 /*Mostra a manilha atual*/
-void imprimeManilha(cartas *manilha){
+void imprimeManilha(cartas *manilha, cartas *virada){
+    printf("Valor da vira:\n");
+    printf("{Naipe: %c,Numero: %c}\n\n", virada->naipe, virada->carta); //O que vai aparecer no jogo de verdade para o jogador
     printf("Valor da manilha:\n");
-    printf("{Naipe: %c,Numero: %c}\n\n", manilha->naipe, manilha->carta);
+    printf("{Naipe: %c,Numero: %c}\n\n", manilha->naipe, manilha->carta); //Para acompanhar se o algoritimo fez certo (na entrega final vai ficar omissa que nem no truco real)
 }
 
 #endif

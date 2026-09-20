@@ -94,11 +94,10 @@ void embaralhador(tp_pilha *baralho){
 }
 
 /*funcao para definir a manilha do jogo*/
-void manilhadora(tp_pilha *baralho, cartas *manilha){
-    cartas pre_manilha; //essa sessao ate a linha 102 e basicamente o processo de triangular o numero da manilha
+void manilhadora(tp_pilha *baralho, cartas *manilha, cartas *virada){
     int referencia=0;
-    pop(baralho, &pre_manilha);
-    referencia=pre_manilha.rank; //usando o ranking da pre-manilha da para achar pelo menos uma carta dentro do grupo onde a manilha esta
+    pop(baralho, virada);
+    referencia=virada->rank; //usando o ranking da pre-manilha da para achar pelo menos uma carta dentro do grupo onde a manilha esta
     referencia=referencia+4;
     for(int i=0; i<39; i++){
         if(referencia==baralho->item[i].rank){
@@ -111,6 +110,7 @@ void manilhadora(tp_pilha *baralho, cartas *manilha){
             baralho->item[i].rank=baralho->item[i].rank+41; 
         }
     }
+    manilha->naipe='P'; //Paus e o naipe mais forte entao a manilha mais forte vai ter ele como default
 }
 
 #endif
