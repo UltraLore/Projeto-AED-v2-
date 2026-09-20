@@ -1,3 +1,4 @@
+/*Modulo da main, reune todas a funcoes*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

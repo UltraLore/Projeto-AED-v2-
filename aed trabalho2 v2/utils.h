@@ -1,3 +1,4 @@
+/*Modulo com funcoes uteis que a gente nao sabe onde mais botar*/
 #ifndef UTILS_H
 #define UTILS_H
 #include <stdio.h>
@@ -33,6 +34,12 @@ void sync(tp_fila *jog, mesa *mes){
         removefila(&temp, &transf);
         inserefila(jog, transf);
     }
+}
+
+/*Mostra a manilha atual*/
+void imprimeManilha(cartas *manilha){
+    printf("Valor da manilha:\n");
+    printf("{Naipe: %c,Numero: %c}\n\n", manilha->naipe, manilha->carta);
 }
 
 #endif

@@ -1,3 +1,4 @@
+/*Modulo das pilhas adaptadas pro struct carta*/
 #ifndef PILHA_H
 #define PILHA_H
 #include <stdio.h>
@@ -6,9 +7,10 @@
 
 typedef struct{
     int topo;
-    cartas item[MAX];
+    cartas item[MAX]; //adaptacao do tipo de variavel armazenada
 }tp_pilha;
 
+//o resto daqui para baixo e o exato mesmo do que foi fornecido das aulas, exceto que tp_item eh cartas agora
 void iniPilha(tp_pilha *p){
     p->topo=-1;
 }

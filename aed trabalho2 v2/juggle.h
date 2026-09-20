@@ -113,10 +113,4 @@ void manilhadora(tp_pilha *baralho, cartas *manilha){
     }
 }
 
-/*Mostra a manilha atual (nem sei onde raios botaria nos modulos entao vai ficar aqui mesmo)*/
-void imprimeManilha(cartas *manilha){
-    printf("Valor da manilha:\n");
-    printf("{Naipe: %c,Numero: %c}\n\n", manilha->naipe, manilha->carta);
-}
-
 #endif

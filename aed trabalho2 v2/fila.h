@@ -1,3 +1,4 @@
+/*Modulo das filas asaptadas para a struct jogador*/
 #ifndef fila_h
 #define fila_h
 #include <stdio.h>
@@ -5,11 +6,12 @@
 #define MAX 100
 
 typedef struct {
-    jogador item[MAX];
+    jogador item[MAX]; //adaptacao do tipo de variavel
     int ini, fim;
     //int tam;
 }tp_fila;
 
+//daqui para baixo eh a mesma coisa que foi fornecida na consturcao da biblioteca de filas em aula, exceto que tp_item eh jogador agora
 void inicializafila(tp_fila *f){
     f->ini=f->fim=MAX-1; //ambos apontam para a ultima posicao da fila
     //f->tam=0
