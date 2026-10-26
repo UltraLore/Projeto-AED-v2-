@@ -9,13 +9,18 @@ typedef struct cartas {
     int rank;
 } cartas;
 
+typedef struct tp_listase_carta{ //tanto tp_no quanto tp_listase_carta e usado
+    cartas info;
+    struct tp_listase_carta *prox;    
+} tp_listase_carta;
+
 /*Estrutura "jogador" que guarada o nome, a dupla no qual ele esta associado, um vetor tipo cartas para representar a mao que tem,
 quantas vitorias o jogador possui pelo bar e os pontos dele dentro de uma sessão de jogo*/
 /*vitorias nao esta sendo usada agora para a primeira entrega mas decidi deixar logo ai pra dar menos dor de cabeca depois*/
 typedef struct jogador {
     char nome[50];
     int dupla;
-    cartas mao[3];
+    tp_listase_carta *mao;
     int vitorias;
     int pontos;
 } jogador;
@@ -24,7 +29,7 @@ typedef struct jogador {
 typedef struct mesa {
     jogador jogadores[4];
     int rodada;
-    int competidas[4];
+    tp_listase_carta *cartas_mesa;
 } mesa;
 
 #endif

@@ -5,49 +5,40 @@
 #include "pilha.h"
 #include "fila.h"
 #include "structs.h"
+#include "listase.h"
 
 /*Como o nome sugere, distribui as cartas entre os jogadores na mesa*/
-void distribuirCartas(tp_pilha *baralho, tp_fila *jogs){
-    tp_fila tempfila; inicializafila(&tempfila);
-    while(filavazia(jogs)!=1){
-        jogador tempjog;
-        cartas tempcarta;
-        removefila(jogs, &tempjog);
+void distribuirCartas(tp_pilha *baralho, mesa *mes){
+    for(int x=0; x<4; x++){
+        mes->jogadores[x].mao=NULL;
         for(int i=0; i<3; i++){
-            pop(baralho, &tempcarta);
-            tempjog.mao[i]=tempcarta;
+            cartas temp;
+            pop(baralho, &temp);
+            insere_listase_no_fim(&mes->jogadores[x].mao, temp);
         }
-        inserefila(&tempfila, tempjog);
-    }
-    while(filavazia(&tempfila)!=1){
-        jogador tempjog2;
-        removefila(&tempfila, &tempjog2);
-        inserefila(jogs, tempjog2);
     }
 }
 
-/*Basicamente eh a funcao que meche na mao do jogador quando ele decide jogar uma carta*/
-/*No momento ele so "zera" a carta jogada, mas como isso e coisa da segunda entrega vou deixar assim para a primeira como placeholder*/
-void jogada(mesa *mes, jogador *jog, int carta_escolhida, int rodada){
-    if(carta_escolhida==1){
-        mes->competidas[rodada]=jog->mao[0].rank;
-        jog->mao[0].carta='0'; jog->mao[0].naipe='0'; jog->mao[0].rank=0;
+/*Efetiva a jogada da carta escolhida pelo jogador, bem similar com a funcao removelistase*/
+int jogar_carta(tp_listase_carta **mao, tp_listase_carta **mesa, char naipe, char card){
+    tp_listase_carta *atu=*mao, *ant=NULL;
+    while(atu!=NULL&&((atu->info.naipe!=naipe)&&(atu->info.carta!=card))){
+        atu=atu->prox;
     }
-    if(carta_escolhida==2){
-        mes->competidas[rodada]=jog->mao[1].rank;
-        jog->mao[1].carta='0'; jog->mao[1].naipe='0'; jog->mao[1].rank=0;
+    if(atu==NULL){
+        return 0;
     }
-    if(carta_escolhida==3){
-        mes->competidas[rodada]=jog->mao[2].rank;
-        jog->mao[2].carta='0'; jog->mao[2].naipe='0'; jog->mao[2].rank=0;
+    printf("Jogando %c %c\n", card, naipe);
+    insere_listase_no_fim(mesa, atu->info);
+    if(ant==NULL){
+        *mao=atu->prox;
     }
-}
-
-/*Mostra a mao do jogador atual*/
-void imprimeMao(cartas *mao){
-    for(int i=0; i<3; i++){
-        printf("{Naipe: %c,Numero: %c, Ranking: %d}\n", mao[i].naipe, mao[i].carta, mao[i].rank);
+    else{
+        ant->prox=atu->prox;
     }
+    free(atu);
+    atu=NULL;
+    return 1;
 }
 
 /*Embaralha as cartas*/
@@ -111,6 +102,55 @@ void manilhadora(tp_pilha *baralho, cartas *manilha, cartas *virada){
         }
     }
     manilha->naipe='P'; //Paus e o naipe mais forte entao a manilha mais forte vai ter ele como default
+}
+
+/*Verifica se o jogador botou algo que deveria ser visivel para ele ou se ele esecreveu qualquer outra coisa que nao seja uma carta sua*/
+int validar_jogada(char *jogada, tp_listase_carta *mao){
+    char numero, naipe;
+    if(strlen(jogada)>2){
+        printf("Entrada invalida\n");
+        return 0;
+    }
+    for(int i=0; i<2; i++){
+        jogada[i]=toupper(jogada[i]); //garante que seja la se esqueceram ou nao do capslock nao seja um problema
+    }
+    numero=jogada[0]; naipe=jogada[1];
+    printf("%c, %c", numero, naipe);
+    tp_listase_carta *atu;
+    atu=mao;
+    while((atu!=NULL)&&(atu->info.carta!=numero||atu->info.naipe!=naipe)){ //verifica se a entrada pertence ou nao ao jogador
+        atu=atu->prox;
+    }
+    if(atu==NULL) {
+        printf("Esta carta nao te pertence, insira uma carta da sua mao\n");
+        return 0;
+    }
+    //"So digo que foi um inferno descobrir que deveria ter formatado a busca do char desse jeito e que não devia utilizar free(atu)" - Felipe, 2026
+    int num_val=(numero == 'A' || numero == '2' || numero == '3' || numero == '4' || numero == '5' || numero == '6' || numero == '7' || numero == 'Q' || numero == 'J' || numero == 'K');
+    int nai_val=(naipe == 'P' || naipe == 'C' || naipe == 'E' || naipe == 'O');
+    if(num_val&&nai_val){
+        printf("Jogando %c de %c\n", numero, naipe);
+        return 1;
+    }
+    else{
+        printf("Entrada invalida\n");
+        return 0;
+    }
+}
+
+int pesamento(tp_listase_carta *competidas, mesa mes){
+    int carta_maior=0, veredito=0;
+    tp_listase_carta *atu;
+    atu=competidas;
+    while((atu!=NULL)){
+        if(atu->info.rank>carta_maior){
+            carta_maior=atu->info.rank;
+            veredito++;
+        }
+        atu=atu->prox;
+    }
+    printf("Jogador %s venceu", mes.jogadores[veredito].nome);
+    return veredito;
 }
 
 #endif
