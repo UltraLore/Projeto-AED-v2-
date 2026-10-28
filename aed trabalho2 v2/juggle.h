@@ -28,7 +28,6 @@ int jogar_carta(tp_listase_carta **mao, tp_listase_carta **mesa, char naipe, cha
     if(atu==NULL){
         return 0;
     }
-    printf("Jogando %c %c\n", card, naipe);
     insere_listase_no_fim(mesa, atu->info);
     if(ant==NULL){
         *mao=atu->prox;
@@ -115,7 +114,6 @@ int validar_jogada(char *jogada, tp_listase_carta *mao){
         jogada[i]=toupper(jogada[i]); //garante que seja la se esqueceram ou nao do capslock nao seja um problema
     }
     numero=jogada[0]; naipe=jogada[1];
-    printf("%c, %c", numero, naipe);
     tp_listase_carta *atu;
     atu=mao;
     while((atu!=NULL)&&(atu->info.carta!=numero||atu->info.naipe!=naipe)){ //verifica se a entrada pertence ou nao ao jogador
@@ -149,7 +147,7 @@ int pesamento(tp_listase_carta *competidas, mesa mes){
         }
         atu=atu->prox;
     }
-    printf("Jogador %s venceu", mes.jogadores[veredito].nome);
+    printf("Jogador %s venceu\n", mes.jogadores[veredito].nome);
     return veredito;
 }
 
