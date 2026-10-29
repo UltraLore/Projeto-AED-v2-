@@ -42,7 +42,7 @@ int remove_listase(tp_listase_carta **lista, char nai, char car){
     tp_listase_carta *ant, *atu;
     atu=*lista;
     ant=NULL;
-    while((atu!=NULL)&&(atu->info.naipe!=nai&&atu->info.carta!=car)){
+    while((atu!=NULL)&&(atu->info.naipe!=nai||atu->info.carta!=car)){
         ant=atu;
         atu=atu->prox;
     }

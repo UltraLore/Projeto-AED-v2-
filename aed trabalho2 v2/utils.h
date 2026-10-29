@@ -44,10 +44,10 @@ void sync(tp_fila *jog, mesa *mes){
 
 /*Reorganiza as filas quando ainda nao e hora de embaralhar*/
 void reorg(tp_fila *jog1, tp_fila *jog2){
-    while(filavazia(&jog2)!=1){
+    while(filavazia(jog2)!=1){  //jog1 e 2 já recebem ponteiros!! então aqui deve ser somente jog2 e não &jog2
         jogador temp;
-        removefila(&jog2, &temp);
-        inserefila(&jog1, temp);
+        removefila(jog2, &temp);
+        inserefila(jog1, temp);
     }
 }
 

@@ -2,8 +2,9 @@
 #define LISTADE_H
 #include <stdio.h>
 #include <stdlib.h>
+#include "structs.h" // precisei chamar pra fazer o VAR funcionar
 
-typedef int tp_item;
+typedef var_registro tp_item; // Outra adaptação em nome do VAR (antes: typedef int tp_item;)
 
 typedef struct tp_no{
     struct tp_no *ant;
@@ -15,6 +16,10 @@ typedef struct tp_listad{
     tp_no *ini;
     tp_no *fim;
 } tp_listad;
+
+int item_igual(tp_item a, tp_item b){
+    return (a.mao == b.mao && a.rodada == b.rodada); // [VAR] Isso aqui existe porque mudei o tipo de tp_item, por acaso sabiam que não da pra comparar structs diretamente? Pois é...
+}
 
 tp_listad *inicializa_listad(){
     tp_listad *lista=(tp_listad*)malloc(sizeof(tp_listad));
@@ -57,7 +62,7 @@ int insere_listad_no_fim(tp_listad *lista, tp_item e){
 int remove_listad(tp_listad *lista, tp_item e){
     tp_no*atu;
     atu=lista->ini;
-    while((atu!=NULL)&&(atu->info!=e)){
+    while((atu!=NULL)&&(!item_igual(atu->info,e))){      // [VAR] antes: (atu->info!=e)
         atu=atu->prox;
     }
     if(atu==NULL) return 0;
@@ -81,7 +86,7 @@ int remove_listad(tp_listad *lista, tp_item e){
 tp_no * busca_listade (tp_listad *lista, tp_item e){   
   tp_no *atu;
   atu = lista->ini;
-  while ( (atu != NULL) && (atu->info != e) ) { 
+  while ( (atu != NULL) && (!item_igual(atu->info,e)) ) {   // [VAR] antes: (atu->info != e)
         atu=atu->prox;}
   return atu;
 }
@@ -94,13 +99,13 @@ void imprime_listad(tp_listad *lista, int ordem) {
      switch (ordem) {
         case 1: atu = lista->ini;
                 while (atu != NULL) {
-                   printf("%d ", atu->info);
+                   printf("M%dR%d ", atu->info.mao, atu->info.rodada);   // [VAR] antes: printf("%d ", atu->info)
                    atu=atu->prox;           
                    }
                 break;   
         case 2: atu = lista->fim;
                 while (atu != NULL) {
-                   printf("%d ", atu->info);
+                   printf("M%dR%d ", atu->info.mao, atu->info.rodada);   // [VAR] antes: printf("%d ", atu->info)
                    atu=atu->ant;           
                    }
                 break;   

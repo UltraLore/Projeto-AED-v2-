@@ -32,4 +32,17 @@ typedef struct mesa {
     tp_listase_carta *cartas_mesa;
 } mesa;
 
+/* Struct para tirar uma "foto" da partida atual!*/
+typedef struct var_registro {
+    int mao;                 // numero da mao (contagem de embaralhamentos)
+    int rodada;              // numero da rodada dentro da mao (1 a 3)
+    cartas vira, manilha;
+    int n_jogadas;           // quantas cartas foram jogadas
+    char nomes[4][50];       // nomes na ordem em que jogaram
+    int duplas[4];
+    cartas jogadas[4];       // identificação de quais cartas foram jogadas e por quem foram
+    int vencedor;            // flag de vencedor da rodada
+    int pontos[4];           // pontuação dos jogadores após a rodada
+} var_registro;
+
 #endif

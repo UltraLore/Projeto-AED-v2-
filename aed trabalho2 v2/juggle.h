@@ -22,7 +22,8 @@ void distribuirCartas(tp_pilha *baralho, mesa *mes){
 /*Efetiva a jogada da carta escolhida pelo jogador, bem similar com a funcao removelistase*/
 int jogar_carta(tp_listase_carta **mao, tp_listase_carta **mesa, char naipe, char card){
     tp_listase_carta *atu=*mao, *ant=NULL;
-    while(atu!=NULL&&((atu->info.naipe!=naipe)&&(atu->info.carta!=card))){
+    while(atu!=NULL&&((atu->info.naipe!=naipe)||(atu->info.carta!=card))){
+        ant=atu;
         atu=atu->prox;
     }
     if(atu==NULL){
@@ -137,15 +138,16 @@ int validar_jogada(char *jogada, tp_listase_carta *mao){
 }
 
 int pesamento(tp_listase_carta *competidas, mesa mes){
-    int carta_maior=0, veredito=0;
+    int carta_maior=0, veredito=0, pos=0;
     tp_listase_carta *atu;
     atu=competidas;
     while((atu!=NULL)){
         if(atu->info.rank>carta_maior){
             carta_maior=atu->info.rank;
-            veredito++;
+            veredito=pos; // corrigido de veredito++ para indicar a posição do jogador que venceu
         }
         atu=atu->prox;
+        pos++;
     }
     printf("Jogador %s venceu\n", mes.jogadores[veredito].nome);
     return veredito;
